@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  fullName     String
+  phone        String        @unique
+  passwordHash String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  households   Household[]   @relation("CreatedHouseholds")
+  expenses     Expense[]
+  incomes      Income[]
+  priceReports PriceReport[]
+}
+
+model Household {
+  id           String       @id @default(uuid())
+  name         String
+  city         String?
+  commune      String?
+  currencyCode String       @default("CDF")
+  createdById  String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  createdBy    User         @relation("CreatedHouseholds", fields: [createdById], references: [id])
+  budgetWeeks  BudgetWeek[]
+  expenses     Expense[]
+  incomes      Income[]
+}
+
+model BudgetWeek {
+  id                String    @id @default(uuid())
+  householdId       String
+  startDate         DateTime
+  endDate           DateTime
+  plannedBudget     Decimal   @db.Decimal(14, 2)
+  plannedFoodBudget Decimal?  @db.Decimal(14, 2)
+  savingsGoal       Decimal?  @db.Decimal(14, 2)
+  status            String    @default("open")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  household         Household @relation(fields: [householdId], references: [id])
+  expenses          Expense[]
+  incomes           Income[]
+}
+
+model Expense {
+  id            String     @id @default(uuid())
+  householdId   String
+  budgetWeekId  String
+  category      String
+  amount        Decimal    @db.Decimal(14, 2)
+  operationDate DateTime
+  note          String?
+  authorUserId  String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  household     Household  @relation(fields: [householdId], references: [id])
+  budgetWeek    BudgetWeek @relation(fields: [budgetWeekId], references: [id])
+  author        User       @relation(fields: [authorUserId], references: [id])
+}
+
+model Income {
+  id            String     @id @default(uuid())
+  householdId   String
+  budgetWeekId  String
+  sourceLabel   String
+  amount        Decimal    @db.Decimal(14, 2)
+  operationDate DateTime
+  note          String?
+  authorUserId  String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  household     Household  @relation(fields: [householdId], references: [id])
+  budgetWeek    BudgetWeek @relation(fields: [budgetWeekId], references: [id])
+  author        User       @relation(fields: [authorUserId], references: [id])
+}
+
+model PriceReport {
+  id               String         @id @default(uuid())
+  productId        String
+  marketLocationId String
+  unit             String
+  price            Decimal        @db.Decimal(14, 2)
+  currencyCode     String         @default("CDF")
+  observedOn       DateTime
+  sourceType       String         @default("community")
+  validationStatus String         @default("pending")
+  reportedByUserId String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  product          Product        @relation(fields: [productId], references: [id])
+  marketLocation   MarketLocation @relation(fields: [marketLocationId], references: [id])
+  reportedBy       User           @relation(fields: [reportedByUserId], references: [id])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  defaultUnit String
+  category    String?
+  isActive    Boolean  @default(true)
+
+  weeklyConsumptionPerPerson Float?
+
+  createdAt   DateTime @default(now())
+
+  priceReports         PriceReport[]
+  priceDailyAggregates PriceDailyAggregate[]
+}
+
+model MarketLocation {
+  id         String   @id @default(uuid())
+  province   String?
+  city       String?
+  commune    String?
+  marketName String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  latitude   Float?
+  longitude  Float?
+
+  priceReports         PriceReport[]
+  priceDailyAggregates PriceDailyAggregate[]
+}
+
+model PriceDailyAggregate {
+  id               String   @id @default(uuid())
+  productId        String
+  marketLocationId String
+  observedOn       DateTime
+  avgPrice         Decimal  @db.Decimal(14, 2)
+  minPrice         Decimal  @db.Decimal(14, 2)
+  maxPrice         Decimal  @db.Decimal(14, 2)
+  reportCount      Int      @default(1)
+  createdAt        DateTime @default(now())
+
+  product        Product        @relation(fields: [productId], references: [id])
+  marketLocation MarketLocation @relation(fields: [marketLocationId], references: [id])
+}
