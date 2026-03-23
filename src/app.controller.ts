@@ -1,13 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller()
 export class AppController {
 
   @Get('health')
+  @SkipThrottle()
   health() {
     return {
       status: 'ok',
-      service: 'bfhk-backend-api'
+      service: 'bfhk-backend-api',
+      timestamp: new Date().toISOString(),
     };
   }
 

@@ -7,7 +7,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('BFHK API')

@@ -21,12 +21,16 @@ __decorate([
 ], RegisterDto.prototype, "fullName", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.Matches)(/^\+?[0-9]{8,15}$/, {
+        message: 'Numéro de téléphone invalide',
+    }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "phone", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.MinLength)(6, {
+        message: 'Le mot de passe doit contenir au moins 6 caractères',
+    }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);
 class LoginDto {
@@ -34,12 +38,16 @@ class LoginDto {
 exports.LoginDto = LoginDto;
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.Matches)(/^\+?[0-9]{8,15}$/, {
+        message: 'Numéro de téléphone invalide',
+    }),
     __metadata("design:type", String)
 ], LoginDto.prototype, "phone", void 0);
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(6),
+    (0, class_validator_1.MinLength)(6, {
+        message: 'Le mot de passe doit contenir au moins 6 caractères',
+    }),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
 //# sourceMappingURL=dto.js.map

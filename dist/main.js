@@ -8,7 +8,11 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.setGlobalPrefix('api');
     app.enableCors();
-    app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(new common_1.ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+    }));
     const swaggerConfig = new swagger_1.DocumentBuilder()
         .setTitle('BFHK API')
         .setDescription('API BFHK')
